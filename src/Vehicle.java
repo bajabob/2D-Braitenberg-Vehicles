@@ -87,11 +87,11 @@ public class Vehicle {
 					if(isCrossed){
 						if(angle < 0.0 && angle > -80.0){
 							rotation -= 3.0;
-							speedChange = true;
+							//speedChange = true;
 							break;
 						}else if(angle > 0.0 && angle < 80.0){
 							rotation += 3.0;
-							speedChange = true;
+							///speedChange = true;
 							break;
 						}
 						if(Point2D.distance( bot.getX(), bot.getY(), light.getX(), light.getY() ) < 18.0 && canCaptureLights){
@@ -105,10 +105,10 @@ public class Vehicle {
 						double deflect = ((intensity - distance) * 10.0) / intensity;
 						if(angle < 0.0 && angle > -60.0){
 							rotation += deflect;
-							speedChange = true;
+							//speedChange = true;
 						}else if(angle > 0.0 && angle < 60.0){
 							rotation -= deflect;
-							speedChange = true;
+							//speedChange = true;
 						}
 					}
 					
