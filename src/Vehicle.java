@@ -9,6 +9,10 @@ import math.geom2d.Point2D;
 import math.geom2d.Vector2D;
 
 public class Vehicle {
+	
+	private static final double MIN_SPEED = 2.0;
+	private static final double MAX_SPEED = 10.0;
+	
 	private double globalX, globalY;
 	double rotation;
 
@@ -23,16 +27,14 @@ public class Vehicle {
 	private BodyOfCar car;
 	private double speed;
 
-	// 10 , 47
 	public Vehicle(int globalX, int globalY, boolean isCrossed) {
 
-		this.speed = 2.0;
+		this.speed = MIN_SPEED;
 		this.globalX = globalX;
 		this.globalY = globalY;
 
 		Random r = new Random();
 		this.rotation = r.nextInt(360);
-		//rotation = 45;
 
 		leftSensor = new Sensors(20, 3, 12, 4);
 
@@ -69,7 +71,7 @@ public class Vehicle {
 				
 				double distance = Math.sqrt(Math.pow(vecX, 2)
 						+ Math.pow(vecY, 2));
-				if (distance < intensity) {
+				if (distance < (intensity-50)) {
 
 					Vector2D bot = new Vector2D(Math.cos(Math.toRadians(rotation))*2.0, 
 							Math.sin(Math.toRadians(rotation))*2.0);
@@ -80,17 +82,21 @@ public class Vehicle {
 					
 					double angle = Math.toDegrees(Math.atan2( crossBL , dotBL ));
 					
+					boolean speedChange = false;
+					
 					if(isCrossed){
 						if(angle < 0.0 && angle > -80.0){
 							rotation -= 3.0;
+							speedChange = true;
 							break;
 						}else if(angle > 0.0 && angle < 80.0){
 							rotation += 3.0;
+							speedChange = true;
 							break;
 						}
 						if(Point2D.distance( bot.getX(), bot.getY(), light.getX(), light.getY() ) < 18.0 && canCaptureLights){
 							lights.get(i).captureLight();
-							if(speed < 10.0){
+							if(speed < MAX_SPEED){
 								speed += 0.5;
 							}
 						}
@@ -99,9 +105,15 @@ public class Vehicle {
 						double deflect = ((intensity - distance) * 10.0) / intensity;
 						if(angle < 0.0 && angle > -60.0){
 							rotation += deflect;
+							speedChange = true;
 						}else if(angle > 0.0 && angle < 60.0){
 							rotation -= deflect;
+							speedChange = true;
 						}
+					}
+					
+					if(speedChange && speed >= MIN_SPEED){
+						speed -= (MIN_SPEED-0.5);
 					}
 					
 				}
@@ -122,6 +134,10 @@ public class Vehicle {
 			globalX = 800;
 		if (globalY < 0)
 			globalY = 600;
+		
+		if(speed < MIN_SPEED){
+			speed = MIN_SPEED;
+		}
 
 	}
 
