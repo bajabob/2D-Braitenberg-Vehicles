@@ -29,13 +29,17 @@ public class Main
 {
 	 
 	private static final int WIDTH = 800;
-	private static final int HEIGHT = 800;
+	private static final int HEIGHT = 600;
 	
+	private static final int MAX_INTENSITY = 200;
+	private static final int MIN_INTENSITY = 50;
 	
+	private static JButton captureSimulator;
+	private static JButton incLightIntensity, decLightIntensity, clearLights;
     private static JButton incVehicle1, decVehicle1, incVehicle2, decVehicle2;
     private static JButton randomLights;
     
-    private static JLabel numOfVehicles1, numOfVehicles2;
+    private static JLabel numOfVehicles1, numOfVehicles2, lightIntensity;
     
 	private static BackgroundDisplay displayPanel;
 	private static lightPopulation lightPopulation;
@@ -43,16 +47,23 @@ public class Main
 
 	private static class BackgroundDisplay extends JPanel
 	{
-				
-		public Stack<Vehicle> vehicles;
+		
+		public boolean canCaptureLights;
+		public Stack<Vehicle> vehiclesSeekers;
+		public Stack<Vehicle> vehiclesEvaders;
 
 		public BackgroundDisplay(){
-			vehicles = new Stack<Vehicle>();
+			canCaptureLights = false;
+			vehiclesSeekers = new Stack<Vehicle>();
+			vehiclesEvaders = new Stack<Vehicle>();
 		}
 		
 		public void onMove(ArrayList<LightSource>lights){
-			for(int i = 0; i < vehicles.size(); i++){
-				vehicles.get(i).onMove(lights);
+			for(int i = 0; i < vehiclesSeekers.size(); i++){
+				vehiclesSeekers.get(i).onMove(lights, canCaptureLights);
+			}
+			for(int i = 0; i < vehiclesEvaders.size(); i++){
+				vehiclesEvaders.get(i).onMove(lights, false);
 			}
 			this.repaint();
 		}
@@ -66,55 +77,44 @@ public class Main
 				lightPopulation.lights.get(i).onDraw(g, i);
 			}
 			
-			for(int i = 0; i < vehicles.size(); i++){
-				vehicles.get(i).onDraw(g);
+			for(int i = 0; i < vehiclesSeekers.size(); i++){
+				vehiclesSeekers.get(i).onDraw(g);
+			}
+			for(int i = 0; i < vehiclesEvaders.size(); i++){
+				vehiclesEvaders.get(i).onDraw(g);
 			}
 			
 		}
 	}
-
-	public static Point randomPoint(){
-		Random rand = new Random();
-		int  n = rand.nextInt(WIDTH) + 1;
-		int  m = rand.nextInt(HEIGHT) + 1;
-		Point origin = new Point(n,m);
-		
-		return origin;
-	}
-	
-	public static int randomInt(){
-		Random rand = new Random();
-		int x = rand.nextInt(300) + 50;
-		
-		return x;
-	}
 	
 	private static void updateLabels(){
-		
+		lightIntensity.setText( ""+lightPopulation.lightIntensity );
+		numOfVehicles1.setText( ""+displayPanel.vehiclesSeekers.size() );
+		numOfVehicles2.setText( ""+displayPanel.vehiclesEvaders.size() );
+		captureSimulator.setText( "Capture Lights: "+((displayPanel.canCaptureLights) ? "On" : "Off"));
 	}
+	
 	private static class lightPopulation implements ActionListener{
 		
+		public int lightIntensity;
 		public ArrayList<LightSource> lights;
-		public ArrayList<Point> coordinateOfPoints;
 		
 		public lightPopulation(){
+			lightIntensity = 100;
 			lights = new ArrayList<LightSource>();
-			coordinateOfPoints= new ArrayList<Point>();
 		}
-		public void lightRandomPoint(){
-			lights.clear();
-			coordinateOfPoints.clear();
-
-			for(int i = 0; i < randomInt(); i++){
-				Point x = randomPoint();				
-				this.addLight(x);
+		
+		public void clearLights(){
+			for(int i = 0; i < lights.size(); i++){
+				lights.get( i ).captureLight();
 			}
 		}
 		
 		public void addLight(Point p){
-			Random r = new Random();
-			lights.add(new LightSource(p, 5, r.nextInt(50)+50));
-			coordinateOfPoints.add(p);
+			lights.add(new LightSource(p, 5, lightIntensity));
+		}
+		public void addLight(Point p, int intesity){
+			lights.add(new LightSource(p, 5, intesity));
 		}
 		
 		@Override
@@ -124,8 +124,35 @@ public class Main
 			
 			if( button.equals(randomLights))		
 			{
-				lightRandomPoint();
+				clearLights();
+				Random r = new Random(System.currentTimeMillis());
+
+				for(int i = 0; i < 20; i++){
+					Point x = new Point(r.nextInt( WIDTH-100 )+50, 
+							r.nextInt( HEIGHT-100 )+50);				
+					this.addLight(x, r.nextInt( MAX_INTENSITY-MIN_INTENSITY )+MIN_INTENSITY);
+				}
 			}
+			
+			if(button.equals( incLightIntensity )){
+				lightIntensity+=10;
+				if(lightIntensity > MAX_INTENSITY){
+					lightIntensity = MAX_INTENSITY;
+				}
+			}
+			if(button.equals( decLightIntensity )){
+				lightIntensity-=10;
+				if(lightIntensity < MIN_INTENSITY){
+					lightIntensity = MIN_INTENSITY;
+				}
+			}
+			if(button.equals( captureSimulator )){
+				displayPanel.canCaptureLights = !displayPanel.canCaptureLights;
+			}
+			if(button.equals( clearLights )){
+				clearLights();
+			}
+			updateLabels();
 			displayPanel.repaint();
 		}
 			
@@ -138,25 +165,28 @@ public class Main
 			// TODO Auto-generated method stub
 			JButton button = (JButton) e.getSource();
 	
-			
 			if( button.equals(incVehicle1))
 			{
 				Random r = new Random();
-				displayPanel.vehicles.add(new Vehicle(50 + r.nextInt(WIDTH-50), 50+ r.nextInt(HEIGHT-50),true));
+				displayPanel.vehiclesSeekers.add(new Vehicle(50 + r.nextInt(WIDTH-50), 50+ r.nextInt(HEIGHT-50),true));
 				
 			}
 			if( button.equals(decVehicle1))
 			{
-				displayPanel.vehicles.pop();
+				if(!displayPanel.vehiclesSeekers.isEmpty()){
+					displayPanel.vehiclesSeekers.pop();
+				}
 			}
 			if( button.equals(incVehicle2))
 			{
 				Random r = new Random();
-				displayPanel.vehicles.add(new Vehicle(50+r.nextInt(WIDTH-50),50+r.nextInt(HEIGHT-50),false));
+				displayPanel.vehiclesEvaders.add(new Vehicle(50+r.nextInt(WIDTH-50),50+r.nextInt(HEIGHT-50),false));
 							}
 			if( button.equals(decVehicle2))
 			{
-				displayPanel.vehicles.pop();
+				if(!displayPanel.vehiclesEvaders.isEmpty()){
+					displayPanel.vehiclesEvaders.pop();
+				}
 			}
 			
 			
@@ -183,9 +213,21 @@ public class Main
 		decVehicle2 = new JButton("-");
 		decVehicle2.addActionListener( robotPopulation );
 		
+		incLightIntensity = new JButton("+");
+		incLightIntensity.addActionListener( lightPopulation );
+		decLightIntensity = new JButton("-");
+		decLightIntensity.addActionListener( lightPopulation );
+		lightIntensity = new JLabel("", SwingConstants.CENTER);
+		
+		captureSimulator = new JButton();
+		captureSimulator.addActionListener( lightPopulation );
+		
 		randomLights = new JButton("Random Lights");
 		randomLights.addActionListener(lightPopulation);
 	
+		clearLights = new JButton("Clear Lights");
+		clearLights.addActionListener(lightPopulation);
+		
 		numOfVehicles1 = new JLabel("");
 		numOfVehicles2 = new JLabel("");
 	
@@ -216,9 +258,10 @@ public class Main
 		controlPanel.setLayout( new GridBagLayout() );
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = 1;
-		controlPanel.add( new JLabel( "Vehicle 1", SwingConstants.CENTER ), c );
+		controlPanel.add( new JLabel( "Seekers", SwingConstants.CENTER ), c );
 		c.gridx = 1;
 		c.gridy = 1;
 		controlPanel.add( incVehicle1, c );
@@ -231,7 +274,7 @@ public class Main
 
 		c.gridx = 0;
 		c.gridy = 2;
-		controlPanel.add( new JLabel( "Vehicle 2", SwingConstants.CENTER ), c );
+		controlPanel.add( new JLabel( "Evaders", SwingConstants.CENTER ), c );
 		c.gridx = 1;
 		c.gridy = 2;
 		controlPanel.add( incVehicle2, c );
@@ -244,13 +287,32 @@ public class Main
 
 		c.gridx = 0;
 		c.gridy = 3;
-		controlPanel.add( new JLabel( "", SwingConstants.CENTER ), c );
+		controlPanel.add( new JLabel( "Light Intensity", SwingConstants.CENTER ), c );
 		c.gridx = 1;
 		c.gridy = 3;
-		controlPanel.add( randomLights, c );
+		controlPanel.add( incLightIntensity, c );
 		c.gridx = 2;
 		c.gridy = 3;
-		controlPanel.add( new JLabel("Random Lights"), c );
+		controlPanel.add( lightIntensity, c );
+		c.gridx = 3;
+		c.gridy = 3;
+		controlPanel.add( decLightIntensity, c );
+		
+		c.gridx = 0;
+		c.gridy = 4;
+		c.gridwidth = 4;
+		controlPanel.add( randomLights, c );
+		
+		c.gridx = 0;
+		c.gridy = 5;
+		c.gridwidth = 4;
+		controlPanel.add( clearLights, c );
+		
+		c.gridx = 0;
+		c.gridy = 6;
+		c.gridwidth = 4;
+		controlPanel.add( captureSimulator, c );
+		
 		
 		JPanel panes = new JPanel();
 		panes.setLayout( new BorderLayout() );
@@ -264,7 +326,7 @@ public class Main
 		
 		window.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		window.setContentPane( panes );
-		window.setSize( 1150, 620 );
+		window.setSize( 1020, 620 );
 		window.setLocation( 100, 100 );
 		window.setVisible( true );
 		window.setResizable( false );
@@ -273,11 +335,12 @@ public class Main
 
 			public void run() {
 				displayPanel.onMove(lightPopulation.lights);
+				updateLabels();
 			}
 			
 		};
 		Timer timer = new Timer();
-		timer.schedule(timerTask, 500, 50);
+		timer.schedule(timerTask, 500, 20);
 		
 		
 	}

@@ -21,10 +21,12 @@ public class Vehicle {
 	private Sensors rightSensor;
 	private boolean isCrossed;
 	private BodyOfCar car;
+	private double speed;
 
 	// 10 , 47
 	public Vehicle(int globalX, int globalY, boolean isCrossed) {
 
+		this.speed = 2.0;
 		this.globalX = globalX;
 		this.globalY = globalY;
 
@@ -52,7 +54,7 @@ public class Vehicle {
 		}
 	}
 
-	public void onMove(ArrayList<LightSource> lights) {
+	public void onMove(ArrayList<LightSource> lights, boolean canCaptureLights) {
 		if (!lights.isEmpty()) {
 			for (int i = 0; i < lights.size(); i++) {
 
@@ -69,7 +71,6 @@ public class Vehicle {
 						+ Math.pow(vecY, 2));
 				if (distance < intensity) {
 
-					
 					Vector2D bot = new Vector2D(Math.cos(Math.toRadians(rotation))*2.0, 
 							Math.sin(Math.toRadians(rotation))*2.0);
 					Vector2D light = new Vector2D(vecX, vecY);
@@ -79,16 +80,19 @@ public class Vehicle {
 					
 					double angle = Math.toDegrees(Math.atan2( crossBL , dotBL ));
 					
-					
-					
 					if(isCrossed){
 						if(angle < 0.0 && angle > -80.0){
 							rotation -= 3.0;
+							break;
 						}else if(angle > 0.0 && angle < 80.0){
 							rotation += 3.0;
+							break;
 						}
-						if(Point2D.distance( bot.getX(), bot.getY(), light.getX(), light.getY() ) < 10.0){
-							//lights.get(i).captureLight();
+						if(Point2D.distance( bot.getX(), bot.getY(), light.getX(), light.getY() ) < 18.0 && canCaptureLights){
+							lights.get(i).captureLight();
+							if(speed < 10.0){
+								speed += 0.5;
+							}
 						}
 						
 					}else{
@@ -104,8 +108,8 @@ public class Vehicle {
 			}
 		}
 
-		double x = 2.0 * Math.cos(Math.toRadians(rotation));
-		double y = 2.0 * Math.sin(Math.toRadians(rotation));
+		double x = speed * Math.cos(Math.toRadians(rotation));
+		double y = speed * Math.sin(Math.toRadians(rotation));
 
 		this.globalX += x;
 		this.globalY += y;
