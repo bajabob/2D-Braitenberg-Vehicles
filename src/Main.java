@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -142,7 +141,7 @@ public class Main
 			if( button.equals(incVehicle1))
 			{
 				Random r = new Random();
-				displayPanel.vehicles.add(new Vehicle(r.nextInt(WIDTH),r.nextInt(HEIGHT),true));
+				displayPanel.vehicles.add(new Vehicle(50 + r.nextInt(WIDTH-50), 50+ r.nextInt(HEIGHT-50),true));
 				
 			}
 			if( button.equals(decVehicle1))
@@ -152,7 +151,7 @@ public class Main
 			if( button.equals(incVehicle2))
 			{
 				Random r = new Random();
-				displayPanel.vehicles.add(new Vehicle(r.nextInt(WIDTH),r.nextInt(HEIGHT),false));
+				displayPanel.vehicles.add(new Vehicle(50+r.nextInt(WIDTH-50),50+r.nextInt(HEIGHT-50),false));
 							}
 			if( button.equals(decVehicle2))
 			{
@@ -277,7 +276,7 @@ public class Main
 			
 		};
 		Timer timer = new Timer();
-		timer.schedule(timerTask, 500, 5);
+		timer.schedule(timerTask, 500, 50);
 		
 		
 	}

@@ -1,12 +1,11 @@
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.geom.Point2D;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
+
+import math.geom2d.Vector2D;
 
 public class Vehicle {
 	private double globalX, globalY;
@@ -60,37 +59,29 @@ public class Vehicle {
 
 				double vecX = (p.x - this.globalX);
 				double vecY = (p.y - this.globalY);
-
+				
 				double distance = Math.sqrt(Math.pow(vecX, 2)
 						+ Math.pow(vecY, 2));
 				if (distance < 100) {
 
-					// double angle = Math.toDegrees(Math.atan(vecY/vecX));
-
-					// angle = angle + rotation;
-
-					double xDir = (Math.cos(rotation) * 100);
-					double yDir = (Math.sin(rotation) * 100);
 					
-					double xLight = vecX;
-					double yLight = vecY;
 					
-					double angle = ((xDir * xLight) + (yDir * yLight))
-							/ (Math.sqrt(Math.pow(xDir, 2)
-									+ Math.pow(yDir, 2))
-							* Math.sqrt(Math.pow(xLight, 2) + Math.pow(yLight, 2)));
-
-					angle = Math.toDegrees(angle);
+					Vector2D bot = new Vector2D(Math.cos( Math.toRadians(rotation))*100, Math.sin( Math.toRadians(rotation))*100);
+					Vector2D light = new Vector2D(vecX, vecY);
 					
-					double deduct = (10.0 * (100-distance)) / 100;
+					double dotBL = bot.dot( light );
+					double crossBL = bot.cross( light);
 					
-					if(angle > -25.0 && angle < 0.0){
-						this.rotation -= deduct;
-					}else if(angle < 25.0 && angle >= 0.0){
-						this.rotation += deduct;
+					double angle = Math.toDegrees(Math.atan2( crossBL , dotBL ));
+					
+					double deflect = ((100 - distance) * 10.0) / 100;
+					
+					if(angle < 0.0 && angle > -40.0){
+						rotation += deflect;
+					}else if(angle > 0.0 && angle < 40.0){
+						rotation -= deflect;
 					}
 					
-					System.out.println("angle " + angle);
 				}
 			}
 		}

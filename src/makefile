@@ -1,16 +1,5 @@
-JFLAGS = -g
-JC = javac
-.SUFFIXES: .java .class
-.java.class:
-	$(JC) $(JFLAGS) $*.java
-
-CLASSES = \
-	Main.java
-
-default: clean classes
-
-classes: $(CLASSES:.java=.class)
+all:
+	javac -g -cp javaGeom-0.11.2.jar *.java
 
 clean:
-	$(RM) *.class
-	$(RM) */*.class
+	rm -rf *.class
