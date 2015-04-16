@@ -9,15 +9,23 @@ public class LightSource
 
 	private int radius;
 	
-	private Color color;
+	private int intensity;
+	
+	private boolean isCaptured;
+	
+	private static Color COLOR = new Color(1.0f, 1.0f, 1.0f, 0.1f);
 
-	public LightSource( Point center, int radius, Color color )
+	public LightSource( Point center, int radius, int intensity )
 	{
 		this.center = new Point( center.x - radius, center.y - radius );
 		this.radius = radius;
-		this.color = color;
+		this.intensity = intensity;
+		isCaptured = false;
 	}
 	
+	public int getIntensity(){
+		return this.intensity;
+	}
 	
 	public void setCenter(Point _center){
 		center = _center;
@@ -33,12 +41,24 @@ public class LightSource
 	public int getRadius(){
 		return radius;
 	}
+	
+	public void captureLight(){
+		this.isCaptured = true;
+	}
+	
+	public boolean isCaptured(){
+		return this.isCaptured;
+	}
 
 	public void onDraw( Graphics g, int index )
 	{
-		g.setColor(Color.RED);
-		g.drawString(index+"", center.x, center.y);
-		g.setColor( color );
+		if(isCaptured){
+			return;
+		}
+		g.setColor( COLOR );
+		g.fillOval( center.x-(intensity/2)+radius, center.y-(intensity/2)+radius, intensity, intensity );
+		
+		g.setColor( Color.YELLOW );
 		g.fillOval( center.x, center.y, radius * 2, radius * 2 );
 	}
 

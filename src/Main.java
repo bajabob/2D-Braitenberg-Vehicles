@@ -112,7 +112,8 @@ public class Main
 		}
 		
 		public void addLight(Point p){
-			lights.add(new LightSource(p, 3, Color.YELLOW));
+			Random r = new Random();
+			lights.add(new LightSource(p, 5, r.nextInt(50)+50));
 			coordinateOfPoints.add(p);
 		}
 		

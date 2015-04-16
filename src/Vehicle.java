@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 
+import math.geom2d.Point2D;
 import math.geom2d.Vector2D;
 
 public class Vehicle {
@@ -55,18 +56,22 @@ public class Vehicle {
 		if (!lights.isEmpty()) {
 			for (int i = 0; i < lights.size(); i++) {
 
+				if(lights.get(i).isCaptured()){
+					continue;
+				}
 				Point p = lights.get(i).getCenter();
-
-				double vecX = (p.x - this.globalX);
-				double vecY = (p.y - this.globalY);
+				int intensity = lights.get( i ).getIntensity();
+				
+				double vecX = (p.x - (this.globalX-10.0));
+				double vecY = (p.y - (this.globalY-10.0));
 				
 				double distance = Math.sqrt(Math.pow(vecX, 2)
 						+ Math.pow(vecY, 2));
-				if (distance < 100) {
+				if (distance < intensity) {
 
 					
-					
-					Vector2D bot = new Vector2D(Math.cos( Math.toRadians(rotation))*100, Math.sin( Math.toRadians(rotation))*100);
+					Vector2D bot = new Vector2D(Math.cos(Math.toRadians(rotation))*2.0, 
+							Math.sin(Math.toRadians(rotation))*2.0);
 					Vector2D light = new Vector2D(vecX, vecY);
 					
 					double dotBL = bot.dot( light );
@@ -74,12 +79,25 @@ public class Vehicle {
 					
 					double angle = Math.toDegrees(Math.atan2( crossBL , dotBL ));
 					
-					double deflect = ((100 - distance) * 10.0) / 100;
 					
-					if(angle < 0.0 && angle > -40.0){
-						rotation += deflect;
-					}else if(angle > 0.0 && angle < 40.0){
-						rotation -= deflect;
+					
+					if(isCrossed){
+						if(angle < 0.0 && angle > -80.0){
+							rotation -= 3.0;
+						}else if(angle > 0.0 && angle < 80.0){
+							rotation += 3.0;
+						}
+						if(Point2D.distance( bot.getX(), bot.getY(), light.getX(), light.getY() ) < 10.0){
+							//lights.get(i).captureLight();
+						}
+						
+					}else{
+						double deflect = ((intensity - distance) * 10.0) / intensity;
+						if(angle < 0.0 && angle > -60.0){
+							rotation += deflect;
+						}else if(angle > 0.0 && angle < 60.0){
+							rotation -= deflect;
+						}
 					}
 					
 				}
