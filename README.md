@@ -8,21 +8,21 @@ Avoiders and Seekers is a program that demotrates braitenberg vehicles. Green ve
 
 Example of seekers on screen
 
-![Seekers](https://github.tamu.edu/bobtimm/CSCE-452-Project-4/raw/master/screenshots/seekers.png)
+![Seekers](screenshots/seekers.png)
 
 Example of evaders on screen
 
-![Evaders](https://github.tamu.edu/bobtimm/CSCE-452-Project-4/raw/master/screenshots/evaders.png)
+![Evaders](screenshots/evaders.png)
 
 Example of random lights on screen
 
-![Lights](https://github.tamu.edu/bobtimm/CSCE-452-Project-4/raw/master/screenshots/random-lights.png)
+![Lights](screenshots/random-lights.png)
 
 Example of the simulation in action
 
-![Sim](https://github.tamu.edu/bobtimm/CSCE-452-Project-4/raw/master/screenshots/simulation.png)
+![Sim](screenshots/simulation.png)
 
-### How to Run and Compile
+### Compile & Run
 * From your terminal clone this repo.
 * Navigate terminal into `src` directory.
 * Type `make`
