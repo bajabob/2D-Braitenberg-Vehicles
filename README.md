@@ -20,10 +20,6 @@ Example of random lights on screen
 
 ![Lights](screenshots/random-lights.png)
 
-Example of the simulation in action
-
-![Sim](screenshots/simulation.png)
-
 ### Compile & Run
 * From your terminal clone this repo.
 * Navigate terminal into `src` directory.
