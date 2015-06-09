@@ -1,6 +1,6 @@
 ## CSCE-452-Project-4
 
-Code by Esteban Solis and Robert Timm
+Code by Esteban Solis and Robert (Bob) Timm
 
 ![Seekers & Evaders](screenshots/complex.gif)
 
